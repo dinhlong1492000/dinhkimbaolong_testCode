@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">    
+    <style>
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+    
+        td, th {
+          border: 1px solid #ccc;
+          padding: 10px;
+        }
+      </style>
+    <title>Phiếu Nhập Kho</title>
+</head>
+<body>
+    <div class="d-flex justify-content-center">
+        <div class="px-5 d-flex align-items-center flex-column w-75">
+            <h1>Phiếu Nhập Kho</h1>
+            <form id="inventoryForm">
+                <div class="py-2">
+                    <label for="receivingParty">Tên đơn vị nhận:</label>
+                    <select id="receivingParty" name="receivingParty">
+                        <option value="1">Công ty công nghệ</option>
+                        <option value="2">Công ty truyền thông</option>
+                        <option value="3">Công ty bảo hiểm</option>
+                    </select>
+            
+                    <label for="deliveringParty">Tên đơn vị giao:</label>
+                    <select id="deliveringParty" name="deliveringParty">
+                        <option value="1">Công ty thực phẩm</option>
+                        <option value="2">Công ty natra</option>
+                        <option value="3">Công ty dược hà nội</option>
+                    </select>
+        
+                    <label for="form">Mẫu:</label>
+                    <select id="form" name="form">
+                        <option value="1">Mẫu 1</option>
+                        <option value="2">Mẫu 2</option>
+                        <option value="3">Mẫu 3</option>
+                    </select>
+                </div>
+        
+                <div class="py-2">
+                    <label for="code">Mã phiếu:</label>
+                    <input type="text" id="code" name="code" required>
+            
+                    <label for="owe">Nợ:</label>
+                    <input type="number" id="owe" name="owe" required>
+            
+                    <label for="have">Có:</label>
+                    <input type="number" id="have" name="have" required>
+                </div>
+                <div class="py-2">
+
+                    <label for="deliverName">Họ tên người giao:</label>
+                    <input type="text" id="deliverName" name="deliverName" required>
+            
+                    <label for="invoice">Hóa đơn:</label>
+                    <select id="invoice" name="invoice">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+            
+                    <label for="warehouse">Kho:</label>
+                    <select id="warehouse" name="warehouse">
+                        <option value="1">Kho NVL</option>
+                        <option value="2">Kho KBL</option>
+                        <option value="3">Kho NAR</option>
+                    </select>
+                </div>
+
+                <div class="py-2">
+                    <label for="creator">Người lập phiếu:</label>
+                    <input type="text" id="creator" name="creator" required>
+            
+                    <label for="deliver">Người giao hàng:</label>
+                    <input type="text" id="deliver" name="deliver" required>
+                </div>
+                
+                <div class="py-2">
+                    <label for="warehouseman">Thủ kho:</label>
+                    <input type="text" id="warehouseman" name="warehouseman" required>
+            
+                    <label for="accountant">Kế toán trưởng:</label>
+                    <input type="text" id="accountant" name="accountant" required>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="d-flex justify-content-center" onclick="reviewForm()">Xem tổng quan</button>
+                </div>
+            </form>
+            <div>
+                <div id="render-data"></div>
+                <div id="table-invoice"></div>
+                <div id="total-cost"></div>
+                <div id="button-success" class="d-none">
+                    <div class="d-flex justify-content-center">
+                        <button onclick="submitForm()">Xác nhận</button>
+                    </div>
+                </div>
+                <div id="success-status" class="d-none">
+                    Thêm dữ liệu thành công
+                </div>
+                <div id="error-status" class="d-none">
+                    Thêm dữ liệu thất bại
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js" integrity="sha512-TjBzDQIDnc6pWyeM1bhMnDxtWH0QpOXMcVooglXrali/Tj7W569/wd4E8EDjk1CwOAOPSJon1VfcEt1BI4xIrA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        function renderData({invoice, receipt}, formData) {
+            //data
+            const receiving_party = document.getElementById('receivingParty').options[document.getElementById('receivingParty').selectedIndex].text;
+            const deliveringParty = document.getElementById('deliveringParty').options[document.getElementById('deliveringParty').selectedIndex].text;
+            const temp = `
+            <div class='mt-5'>
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex">
+                        <div class='me-1'>Đơn vị nhận:</div>
+                        <div>${receiving_party}</div>
+                    </div>
+                    <div class="d-flex">
+                        <div class='me-1'>Đơn vị giao:</div>
+                        <div>${deliveringParty}</div>
+                    </div>
+                    <div class="d-flex">
+                        <div class='me-1'>Mẫu:</div>
+                        <div>${formData?.form}</div>
+                    </div>
+                </div>
+                <div class='d-flex'>
+                    <div class='me-1'>Mã phiếu:</div>
+                    <div>${formData?.code}</div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex">
+                        <div class='me-1'>Người lập phiếu:</div>
+                        <div>${formData?.creator_name}</div>
+                    </div>
+                    <div class="d-flex">
+                        <div class='me-1'>Thủ kho:</div>
+                        <div>${formData?.warehouseman_name}</div>
+                    </div>
+                </div>
+            </div>
+            `
+            const targetElement = document.getElementById("render-data");
+            targetElement.innerHTML = temp;
+            //table
+            var table = document.createElement('table');
+             // Create the header row
+            var headerRow = table.createTHead().insertRow(0);
+            for (var key in invoice[0]) {
+                var th = document.createElement('th');
+                th.innerHTML = key;
+                headerRow.appendChild(th);
+            }
+            // Create the data rows
+            for (var i = 0; i < invoice.length; i++) {
+                var row = table.insertRow(-1);
+                for (var key in invoice[i]) {
+                    var cell = row.insertCell(-1);
+                    cell.innerHTML = invoice[i][key];
+                }
+            }
+            // Append the table to the container element
+            var tableContainer = document.getElementById('table-invoice');
+            tableContainer.innerHTML = ''; // Clear previous content
+            tableContainer.appendChild(table);
+
+            // assume
+            const total = `
+            <div class='mt-3'>
+                <div class='d-flex'>
+                    <div class='me-1 ms-auto'>Tổng:</div>
+                    <div>${receipt?.['cost']}</div>
+                </div>    
+            </div>
+            `
+            const totalCost = document.getElementById("total-cost");
+            totalCost.innerHTML = total;
+        }
+
+        const parseDate = (data) => {
+            const { invoices_products, ...receipt } = data
+            const invoice = invoices_products?.map(element => ({
+                    "Tên nhãn hiệu": element?.product_name,
+                    "Mã số": element?.product_code,
+                    "Đơn vị tính": element?.product_unit,
+                    "Số lượng theo chứng từ": element?.quantity_document || 0,
+                    "Số lượng thực nhập": element?.actual_quantity || 0,
+                    "Đơn giá": element?.product_price,
+                    "Thành tiền": element?.cost,
+                }));
+            return {invoice: invoice, receipt: receipt}
+        }
+            
+        function getFormData() {
+            return {
+                receiving_party_id: document.getElementById("receivingParty").value,
+                delivering_party_id: document.getElementById("deliveringParty").value,
+                form: document.getElementById("form").value,
+                code: document.getElementById("code").value,
+                owe: document.getElementById("owe").value,
+                have: document.getElementById("have").value,
+                deliver_name: document.getElementById("deliverName").value,
+                invoice_id: document.getElementById("invoice").value,
+                warehouses_id: document.getElementById("warehouse").value,
+                creator_name: document.getElementById("creator").value,
+                warehouseman_name: document.getElementById("warehouseman").value,
+                accountant_name: document.getElementById("accountant").value,
+            };
+        }
+
+        async function reviewForm(){
+            try {
+                 //get data
+                let formData = getFormData();
+                const response = await axios.get(`http://localhost:8888/api/v1/invoice/${formData?.invoice_id}`)
+                const parseData = parseDate(response?.data?.data?.[0])
+                renderData(parseData,formData);
+                document.getElementById('button-success').classList.toggle("d-none");
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        async function submitForm() {
+            try {
+                let formData = getFormData();
+                const response = await axios.post(`http://localhost:8888/api/v1/receipt`,(formData))
+                document.getElementById('success-status').classList.toggle("d-none")
+            } catch (error) {
+                document.getElementById('error-status').classList.toggle("d-none")
+            }
+        }
+    </script>
+
+</body>
+</html>

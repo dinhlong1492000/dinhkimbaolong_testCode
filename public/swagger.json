@@ -1,0 +1,173 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"CReceiptCreate": {
+				"properties": {
+					"accountant_name": {
+						"type": "string"
+					},
+					"warehouseman_name": {
+						"type": "string"
+					},
+					"deliver_name": {
+						"type": "string"
+					},
+					"creator_name": {
+						"type": "string"
+					},
+					"warehouses_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"delivering_party_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"receiving_party_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"invoice_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"form": {
+						"type": "number",
+						"format": "double"
+					},
+					"have": {
+						"type": "number",
+						"format": "double"
+					},
+					"owe": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"creator_name",
+					"warehouses_id",
+					"delivering_party_id",
+					"receiving_party_id",
+					"invoice_id",
+					"form",
+					"have",
+					"owe",
+					"code"
+				],
+				"type": "object"
+			},
+			"CResponse": {
+				"properties": {
+					"data": {},
+					"status": {
+						"type": "string",
+						"enum": [
+							"success",
+							"error"
+						]
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "",
+		"contact": {}
+	},
+	"paths": {
+		"/api/v1/receipt": {
+			"post": {
+				"operationId": "createReceipt",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Receipts"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CReceiptCreate"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/invoice/{id}": {
+			"get": {
+				"operationId": "GetInvoice",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Receipts"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

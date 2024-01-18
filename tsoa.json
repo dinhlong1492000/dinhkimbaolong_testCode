@@ -1,0 +1,16 @@
+{
+    "entryFile": "src/ExpressServer.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": ["src/controllers/**/*Controller.ts"],
+    "spec": {
+      "outputDirectory": "public",
+      "specVersion": 3,
+      "basePath": "",
+      "schemes": ["http", "https"]
+    },
+    "routes": {
+      "middleware": "express",
+      "routesDir": "./src/routes"
+    }
+  }
+  
